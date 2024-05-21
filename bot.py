@@ -4,8 +4,8 @@ from datetime import datetime
 import schedule
 import time
 
-BOT_TOKEN = '492308814:AAGVy3y1t5xb6OroUfSLPlFwOeXArG3K8OI'
-CHAT_ID = '-1001416481750'
+BOT_TOKEN = ''
+CHAT_ID = ''
 
 if not BOT_TOKEN or not CHAT_ID:
     print('Please provide both BOT_TOKEN and CHAT_ID')
