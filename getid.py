@@ -1,7 +1,7 @@
 from telegram import Update, Bot
 from telegram.ext import Updater, CommandHandler, CallbackContext
 
-BOT_TOKEN = '492308814:AAGVy3y1t5xb6OroUfSLPlFwOeXArG3K8OI'
+BOT_TOKEN = '1245678'
 
 # Инициализация бота и диспетчера
 updater = Updater(token=BOT_TOKEN, use_context=True)
