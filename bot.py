@@ -6,16 +6,13 @@ import time
 import os
 from dotenv import load_dotenv
 
-<<<<<<< HEAD
+
 # Загружаем переменные окружения из файла .env
 load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
-=======
-BOT_TOKEN = ''
-CHAT_ID = ''
->>>>>>> 1b25c823de35aeed521093e969f54a267ff0aac1
+
 
 if not BOT_TOKEN or not CHAT_ID:
     print('Please provide both BOT_TOKEN and CHAT_ID')
