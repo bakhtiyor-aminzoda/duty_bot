@@ -54,7 +54,7 @@ def send_duty_message():
 
 # Планирование задачи на каждый рабочий день в 09:05
 for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
-    getattr(schedule.every(), day).at("16:18").do(send_duty_message)
+    getattr(schedule.every(), day).at("10:57").do(send_duty_message)
 
 # Бесконечный цикл для выполнения запланированных задач
 print('Bot is running...')
