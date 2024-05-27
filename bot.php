@@ -1,7 +1,7 @@
 <?php
 
-$BOT_TOKEN = getenv('BOT_TOKEN');
-$CHAT_ID = getenv('CHAT_ID');
+$BOT_TOKEN = '492308814:AAGVy3y1t5xb6OroUfSLPlFwOeXArG3K8OI';
+$CHAT_ID = '-819383773';
 
 if (!$BOT_TOKEN || !$CHAT_ID) {
     echo 'Please provide both BOT_TOKEN and CHAT_ID';
