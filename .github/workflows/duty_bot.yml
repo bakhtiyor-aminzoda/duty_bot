@@ -2,7 +2,7 @@ name: Send Telegram Message Daily
 
 on:
   schedule:
-    - cron: '10 19 * * *' # Каждый день в 18:50 UTC
+    - cron: '11 19 * * *' # Каждый день в 18:50 UTC
   workflow_dispatch:
 
 jobs:
@@ -13,19 +13,24 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Set up Python
-      uses: actions/setup-python@v2
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
       with:
-        python-version: '3.x'
+        php-version: '8.0'
 
+    - name: Install Composer
+      run: |
+        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+        php composer-setup.php --filename=composer --install-dir=/usr/local/bin
+        php -r "unlink('composer-setup.php');"
+      
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install python-telegram-bot==13.7 python-dotenv urllib3
+        composer require vlucas/phpdotenv
+        composer require telegram-bot/api
 
     - name: Run script
+      run: php bot.php
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
-      run: |
-        python bot.py
