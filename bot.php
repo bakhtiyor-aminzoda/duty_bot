@@ -13,22 +13,42 @@ $duty_schedule = [
     'Friday' => ['db_duty' => '@MitolKing', 'db_substitute' => '@AnbozSultonov', 'frontend_tasks' => '@komyobraufzoda', 'support_fixes' => '@eldor_juraev', 'substitute' => '@AnbozSultonov']
 ];
 
-// Функция для отправки сообщения о дежурном и замене
+function format_duty_message($schedule_for_today)
+{
+    $message = [
+        "Сегодняшние дежурные:",
+        "- Дежурство по БД: " . $schedule_for_today['db_duty'] . ", замена " . $schedule_for_today['db_substitute'],
+        "- Фронтенд задачи: " . $schedule_for_today['frontend_tasks'],
+        "- Саппорт/багфиксы: " . $schedule_for_today['support_fixes'],
+        "Замена задач фронтенда или саппорта при необходимости: " . $schedule_for_today['substitute']
+    ];
+    return implode("\n", $message);
+}
+
+function send_message_to_telegram($token, $chatId, $message)
+{
+    $encoded_message = urlencode($message);
+    $url = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chatId&text=$encoded_message";
+    $response = file_get_contents($url);
+    return json_decode($response, true);
+}
+
 function send_duty_message($token, $chitId, $duty_schedule)
 {
     $today = date('l');
     $schedule_for_today = $duty_schedule[$today] ?? null;
 
     if ($schedule_for_today) {
-        $message = "Сегодняшние дежурные:\n";
-        $message .= "— Дежурство по БД: " . $schedule_for_today['db_duty'] . ", замена " . $schedule_for_today['db_substitute'] . "\n";
-        $message .= "— Фронтенд задачи: " . $schedule_for_today['frontend_tasks'] . "\n";
-        $message .= "— Саппорт/багфиксы: " . $schedule_for_today['support_fixes'] . "\n";
-        $message .= "Замена задач фронтенда или саппорта при необходимости: " . $schedule_for_today['substitute'];
+        $message = format_duty_message($schedule_for_today);
+        $response = send_message_to_telegram($token, $chitId, $message);
 
-        $message = "chat_id=$chitId&text=$message";
-
-        file_get_contents("https://api.telegram.org/bot$token/sendMessage?$message");
+        if ($response && $response['ok']) {
+            echo "Сообщение успешно отправлено в Telegram.";
+        } else {
+            echo "Ошибка при отправке сообщения в Telegram.";
+        }
+    } else {
+        echo "На сегодня расписание дежурств не найдено.";
     }
 }
 
