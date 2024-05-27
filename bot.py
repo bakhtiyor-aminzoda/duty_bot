@@ -1,18 +1,14 @@
 from telegram import Bot, ParseMode
 from telegram.error import TelegramError
 from datetime import datetime
-import schedule
-import time
 import os
 from dotenv import load_dotenv
-
 
 # Загружаем переменные окружения из файла .env
 load_dotenv()
 
 BOT_TOKEN = os.getenv('BOT_TOKEN')
 CHAT_ID = os.getenv('CHAT_ID')
-
 
 if not BOT_TOKEN or not CHAT_ID:
     print('Please provide both BOT_TOKEN and CHAT_ID')
@@ -52,12 +48,5 @@ def send_duty_message():
     else:
         print(f'No duty schedule for {today}.')
 
-# Планирование задачи на каждый рабочий день в 09:05
-for day in ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']:
-    getattr(schedule.every(), day).at("10:57").do(send_duty_message)
-
-# Бесконечный цикл для выполнения запланированных задач
-print('Bot is running...')
-while True:
-    schedule.run_pending()
-    time.sleep(1)
+# Отправка сообщения
+send_duty_message()
