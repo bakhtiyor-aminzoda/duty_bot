@@ -2,7 +2,7 @@ name: Send Telegram Message Daily
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Every day at 18:50 UTC
+    - cron: '20 15 * * *' # Every day at 20:20 in Dushanbe, Tajikistan (GMT+5)
   workflow_dispatch:
 
 jobs:
