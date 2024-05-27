@@ -2,7 +2,7 @@ name: Send Telegram Message Daily
 
 on:
   schedule:
-    - cron: '51 18 * * 1-5' # Каждый рабочий день в 9:00 UTC
+    - cron: '01 19 * * 1-5' # Каждый рабочий день в 9:00 UTC
   workflow_dispatch:
 
 jobs:
@@ -28,4 +28,4 @@ jobs:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
         CHAT_ID: ${{ secrets.CHAT_ID }}
       run: |
-        python ../../bot.py
+        python bot.py
