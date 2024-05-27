@@ -1,8 +1,8 @@
 <?php
 
-$token = '492308814:AAGVy3y1t5xb6OroUfSLPlFwOeXArG3K8OI';
-$chitId = '-819383773';
-
+// Получение токена и ID чата из переменных окружения
+$token = getenv('BOT_TOKEN');
+$chatId = getenv('CHAT_ID');
 
 // Расписание дежурств и замен
 $duty_schedule = [
@@ -13,6 +13,7 @@ $duty_schedule = [
     'Friday' => ['db_duty' => '@MitolKing', 'db_substitute' => '@AnbozSultonov', 'frontend_tasks' => '@komyobraufzoda', 'support_fixes' => '@eldor_juraev', 'substitute' => '@AnbozSultonov']
 ];
 
+// Форматирование сообщения о дежурстве
 function format_duty_message($schedule_for_today)
 {
     $message = [
@@ -25,6 +26,7 @@ function format_duty_message($schedule_for_today)
     return implode("\n", $message);
 }
 
+// Отправка сообщения в Telegram
 function send_message_to_telegram($token, $chatId, $message)
 {
     $encoded_message = urlencode($message);
@@ -33,14 +35,15 @@ function send_message_to_telegram($token, $chatId, $message)
     return json_decode($response, true);
 }
 
-function send_duty_message($token, $chitId, $duty_schedule)
+// Отправка сообщения о дежурстве
+function send_duty_message($token, $chatId, $duty_schedule)
 {
     $today = date('l');
     $schedule_for_today = $duty_schedule[$today] ?? null;
 
     if ($schedule_for_today) {
         $message = format_duty_message($schedule_for_today);
-        $response = send_message_to_telegram($token, $chitId, $message);
+        $response = send_message_to_telegram($token, $chatId, $message);
 
         if ($response && $response['ok']) {
             echo "Сообщение успешно отправлено в Telegram.";
@@ -52,4 +55,4 @@ function send_duty_message($token, $chitId, $duty_schedule)
     }
 }
 
-send_duty_message($token, $chitId, $duty_schedule);
+send_duty_message($token, $chatId, $duty_schedule);
