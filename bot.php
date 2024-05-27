@@ -1,9 +1,5 @@
 <?php
 
-// Load environment variables
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
-$dotenv->load();
-
 $BOT_TOKEN = getenv('BOT_TOKEN');
 $CHAT_ID = getenv('CHAT_ID');
 
@@ -34,35 +30,29 @@ function send_duty_message($chat_id, $duty_schedule)
         $message .= "— Саппорт/багфиксы: " . $schedule_for_today['support_fixes'] . "\n";
         $message .= "Замена задач фронтенда или саппорта при необходимости: " . $schedule_for_today['substitute'];
 
-        $url = 'https://api.telegram.org/bot' . $BOT_TOKEN . '/sendMessage';
-        $data = [
-            'chat_id' => $chat_id,
-            'text' => $message,
-            'parse_mode' => 'HTML'
-        ];
-
-        $options = [
-            'http' => [
-                'method' => 'POST',
-                'header' => 'Content-Type: application/json',
-                'content' => json_encode($data)
-            ]
-        ];
-
-        $context = stream_context_create($options);
-        $result = file_get_contents($url, false, $context);
-
-        if ($result !== false) {
-            echo 'Duty message sent and pinned successfully.';
-        } else {
-            echo 'Error sending duty message.';
+        $message = urldecode($message);
+        
+        $url = "https://api.telegram.org/bot$BOT_TOKEN/sendMessage?chat_id=$CHAT_ID&text=$message";
+        
+        // Initialize cURL session
+        $ch = curl_init();
+        
+        // Set cURL options
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        
+        // Execute cURL session
+        $response = curl_exec($ch);
+        
+        // Check for errors
+        if(curl_errno($ch)){
+            echo 'Curl error: ' . curl_error($ch);
         }
-    } else {
-        echo 'No duty schedule for ' . $today;
+        
+        // Close cURL session
+        curl_close($ch);
+        
+        // Output response
+        echo $response;
     }
 }
-
-// Отправка сообщения
-send_duty_message($CHAT_ID, $duty_schedule);
-
-?>

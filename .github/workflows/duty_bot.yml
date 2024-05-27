@@ -18,16 +18,6 @@ jobs:
       with:
         php-version: '8.0'
 
-    - name: Install Composer
-      run: |
-        php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-        php composer-setup.php --filename=composer --install-dir=/usr/local/bin
-        php -r "unlink('composer-setup.php');"
-      
-    - name: Install dependencies
-      run: |
-        composer install --prefer-dist --no-progress --no-suggest
-
     - name: Run script
       run: php bot.php
       env:
