@@ -1,8 +1,8 @@
-name: Send Telegram Message Every Minute
+name: Send Telegram Message Daily
 
 on:
   schedule:
-    - cron: '* * * * *' # Every minute
+    - cron: '0 5 * * *' # Запуск в 09:00 по времени Таджикистана, Душанбе (GMT+5)
 
 jobs:
   sendMessage:
