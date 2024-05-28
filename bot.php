@@ -1,6 +1,6 @@
 <?php
 
-// Получение токена и ID чата из переменных окружения
+// Получаем токен и chat ID из переменных окружения
 $token = getenv('BOT_TOKEN');
 $chatId = getenv('CHAT_ID');
 
@@ -13,29 +13,39 @@ $duty_schedule = [
     'Friday' => ['db_duty' => '@MitolKing', 'db_substitute' => '@AnbozSultonov', 'frontend_tasks' => '@komyobraufzoda', 'support_fixes' => '@eldor_juraev', 'substitute' => '@AnbozSultonov']
 ];
 
-// Форматирование сообщения о дежурстве
+// Функция для форматирования сообщения
 function format_duty_message($schedule_for_today)
 {
-    $message = [
+    return implode("\n", [
         "Сегодняшние дежурные:",
-        "- Дежурство по БД: " . $schedule_for_today['db_duty'] . ", замена " . $schedule_for_today['db_substitute'],
-        "- Фронтенд задачи: " . $schedule_for_today['frontend_tasks'],
-        "- Саппорт/багфиксы: " . $schedule_for_today['support_fixes'],
-        "Замена задач фронтенда или саппорта при необходимости: " . $schedule_for_today['substitute']
-    ];
-    return implode("\n", $message);
+        "- Дежурство по БД: {$schedule_for_today['db_duty']}, замена {$schedule_for_today['db_substitute']}",
+        "- Фронтенд задачи: {$schedule_for_today['frontend_tasks']}",
+        "- Саппорт/багфиксы: {$schedule_for_today['support_fixes']}",
+        "Замена задач фронтенда или саппорта при необходимости: {$schedule_for_today['substitute']}"
+    ]);
 }
 
-// Отправка сообщения в Telegram
+// Функция для отправки сообщения в Telegram
 function send_message_to_telegram($token, $chatId, $message)
 {
-    $encoded_message = urlencode($message);
-    $url = "https://api.telegram.org/bot$token/sendMessage?chat_id=$chatId&text=$encoded_message";
-    $response = file_get_contents($url);
+    $url = "https://api.telegram.org/bot$token/sendMessage";
+    $data = ['chat_id' => $chatId, 'text' => $message];
+
+    $options = [
+        'http' => [
+            'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+            'method'  => 'POST',
+            'content' => http_build_query($data)
+        ]
+    ];
+
+    $context  = stream_context_create($options);
+    $response = file_get_contents($url, false, $context);
+
     return json_decode($response, true);
 }
 
-// Отправка сообщения о дежурстве
+// Основная функция для отправки сообщения о дежурных
 function send_duty_message($token, $chatId, $duty_schedule)
 {
     $today = date('l');
