@@ -16,11 +16,7 @@ jobs:
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.0'
-    
-    - name: Install dependencies
-      run: composer install
-      # Если у вас есть зависимости, которые нужно установить с помощью Composer
-
+  
     - name: Run script
       env:
         BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
