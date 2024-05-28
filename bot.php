@@ -48,20 +48,30 @@ function send_message_to_telegram($token, $chatId, $message)
 // Основная функция для отправки сообщения о дежурных
 function send_duty_message($token, $chatId, $duty_schedule)
 {
-    $today = date('l');
-    $schedule_for_today = $duty_schedule[$today] ?? null;
+    // Проверяем текущее время в Душанбе
+    $now = new DateTime('now', new DateTimeZone('Asia/Dushanbe'));
+    $current_hour = (int)$now->format('H');
+    $current_minute = (int)$now->format('i');
 
-    if ($schedule_for_today) {
-        $message = format_duty_message($schedule_for_today);
-        $response = send_message_to_telegram($token, $chatId, $message);
+    // Если текущее время 09:00, то отправляем сообщение
+    if ($current_hour === 11 && $current_minute === 18) {
+        $today = $now->format('l');
+        $schedule_for_today = $duty_schedule[$today] ?? null;
 
-        if ($response && $response['ok']) {
-            echo "Сообщение успешно отправлено в Telegram.";
+        if ($schedule_for_today) {
+            $message = format_duty_message($schedule_for_today);
+            $response = send_message_to_telegram($token, $chatId, $message);
+
+            if ($response && $response['ok']) {
+                echo "Сообщение успешно отправлено в Telegram.";
+            } else {
+                echo "Ошибка при отправке сообщения в Telegram.";
+            }
         } else {
-            echo "Ошибка при отправке сообщения в Telegram.";
+            echo "На сегодня расписание дежурств не найдено.";
         }
     } else {
-        echo "На сегодня расписание дежурств не найдено.";
+        echo "Сейчас не время отправки сообщения.";
     }
 }
 
