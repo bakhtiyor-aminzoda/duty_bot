@@ -54,7 +54,7 @@ function send_duty_message($token, $chatId, $duty_schedule)
     $current_minute = (int)$now->format('i');
 
     // Если текущее время 09:00, то отправляем сообщение
-    if ($current_hour === 11 && $current_minute === 18) {
+    if ($current_hour === 11 && $current_minute === 23) {
         $today = $now->format('l');
         $schedule_for_today = $duty_schedule[$today] ?? null;
 
