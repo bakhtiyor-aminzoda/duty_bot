@@ -2,7 +2,7 @@ name: Send Telegram Message Daily
 
 on:
   schedule:
-    - cron: '45 5 * * *' # Запуск в 09:00 по времени Таджикистана, Душанбе (GMT+5)
+    - cron: '10 6 * * *' # Запуск в 09:00 по времени Таджикистана, Душанбе (GMT+5)
 
 jobs:
   sendMessage:
