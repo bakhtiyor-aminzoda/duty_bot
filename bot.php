@@ -45,70 +45,6 @@ function send_message_to_telegram($token, $chatId, $message)
     return json_decode($response, true);
 }
 
-// Обновление статуса пользователя
-function update_user_status($username, $status, $days)
-{
-    $absences = load_absences();
-    $absences[$username] = [
-        'status' => $status,
-        'end_date' => date('Y-m-d', strtotime("+$days days"))
-    ];
-    save_absences($absences);
-}
-
-// Загрузка информации об отсутствии из файла
-function load_absences()
-{
-    if (file_exists('absences.json')) {
-        $json = file_get_contents('absences.json');
-        return json_decode($json, true);
-    }
-    return [];
-}
-
-// Сохранение информации об отсутствии в файл
-function save_absences($absences)
-{
-    file_put_contents('absences.json', json_encode($absences));
-}
-
-// Проверка статуса пользователя
-function is_user_absent($username)
-{
-    $absences = load_absences();
-    if (isset($absences[$username])) {
-        $end_date = $absences[$username]['end_date'];
-        if (strtotime($end_date) >= strtotime(date('Y-m-d'))) {
-            return true;
-        }
-    }
-    return false;
-}
-
-// Обработка входящих сообщений
-function handle_incoming_message($message, $duty_schedule)
-{
-    global $token, $chatId;
-    
-    if (strpos($message['text'], '/change') === 0) {
-        $parts = explode(' ', $message['text']);
-        if (count($parts) >= 4) {
-            $username = $parts[1];
-            $status = $parts[2];
-            $days = intval($parts[3]);
-            
-            // Обновить информацию о статусе пользователя
-            update_user_status($username, $status, $days);
-            
-            $response_text = "Информация о пользователе {$username} обновлена: {$status} на {$days} дней.";
-            send_message_to_telegram($token, $chatId, $response_text);
-        } else {
-            $response_text = "Неверный формат команды. Используйте: /change @username статус дни";
-            send_message_to_telegram($token, $chatId, $response_text);
-        }
-    }
-}
-
 // Основная функция для отправки сообщения о дежурных
 function send_duty_message($token, $chatId, $duty_schedule)
 {
@@ -116,12 +52,6 @@ function send_duty_message($token, $chatId, $duty_schedule)
     $schedule_for_today = $duty_schedule[$today] ?? null;
 
     if ($schedule_for_today) {
-        foreach ($schedule_for_today as $role => $user) {
-            if (is_user_absent($user)) {
-                $schedule_for_today[$role] = $schedule_for_today[$role . '_substitute'] ?? $user;
-            }
-        }
-
         $message = format_duty_message($schedule_for_today);
         $response = send_message_to_telegram($token, $chatId, $message);
 
@@ -135,32 +65,4 @@ function send_duty_message($token, $chatId, $duty_schedule)
     }
 }
 
-// Загружаем входящие сообщения
-function get_updates($token, $offset)
-{
-    $url = "https://api.telegram.org/bot$token/getUpdates?offset=$offset";
-    $response = file_get_contents($url);
-    return json_decode($response, true);
-}
-
-// Основная функция
-function main()
-{
-    global $token, $chatId, $duty_schedule;
-
-    $offset = 0;
-    while (true) {
-        $updates = get_updates($token, $offset);
-        if ($updates['ok'] && count($updates['result']) > 0) {
-            foreach ($updates['result'] as $update) {
-                $offset = $update['update_id'] + 1;
-                if (isset($update['message'])) {
-                    handle_incoming_message($update['message'], $duty_schedule);
-                }
-            }
-        }
-        sleep(1); // чтобы не перегружать сервер Telegram
-    }
-}
-
-main();
+send_duty_message($token, $chatId, $duty_schedule);
